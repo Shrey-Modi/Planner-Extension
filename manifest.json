@@ -6,8 +6,12 @@
     "background": {
         "service_worker": "background.js"
     },
+    "content_scripts": [{
+        "matches": ["*://my.wisc.edu/*"],
+        "js": ["content.js"]}],
     "permissions": [
-        "storage"
+        "storage",
+        "activeTab"
     ],
     "action": {
         "default_popup": "popup.html",
