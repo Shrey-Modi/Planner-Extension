@@ -14,8 +14,7 @@ chrome.action.onClicked.addListener((tab) => {
   document.querySelector('#download').onclick = () => {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         var currTab = tabs[0];
-        if (currTab) { // Sanity check
-          /* do stuff */
+        if (currTab) { 
           chrome.scripting.executeScript({
             target: { tabId: currTab.id },
             files: ['inject.js']

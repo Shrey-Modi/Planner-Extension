@@ -11,7 +11,7 @@ for (let i = 0; i < allClasses.length; i++) {
     var className = allClasses[i].children[0].children[0].innerHTML;
     var description = allClasses[i].children[0].children[1].innerHTML;
     description = description + " " + allClasses[i].children[0].children[2].innerHTML;
-    description.replace("&nbsp;", " ");
+    description= description.replace("&nbsp;", " ");
     var date = allClasses[i].children[0].children[3].innerHTML.split(" ");
     var time = allClasses[i].children[0].children[4].innerHTML.split("to");
     var startDate = time[0] + date[0] + " " + date[1] + " " + date[date.length - 1];
