@@ -193,7 +193,7 @@ var ics = function(uidDomain, prodId) {
         ];
   
         if (rruleString) {
-          calendarEvent.splice(4, 0, "rrule:FREQ=WEEKLY;COUNT=15");//test manual insert
+          calendarEvent.splice(4, 0, "RRULE:FREQ=WEEKLY;WKST=SU;COUNT=15;BYDAY="+start.getDay);//test manual insert
         }
   
         calendarEvent = calendarEvent.join(SEPARATOR);
