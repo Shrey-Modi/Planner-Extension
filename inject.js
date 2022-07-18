@@ -36,7 +36,7 @@ for (let i = 0; i < allClasses.length; i++) {
     //trying to get rrule to work
 
     //repeat weekly for 15 counts
-    rrule_actual = {"RRULE":{"FREQ":"WEEKLY","COUNT":15}};
+    rrule_actual = {rrule:{freq:"WEEKLY",count:15}};
 
     cal.addEvent(className, description,description, startDate, endDate, rrule_actual);
 
