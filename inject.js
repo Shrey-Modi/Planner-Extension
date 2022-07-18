@@ -33,13 +33,22 @@ for (let i = 0; i < allClasses.length; i++) {
     startDateO.setDate(startDateO.getDate() - dayDiff);
     startDate = startDateO.toISOString();
 
-    for (let j = 0; j < 15; j++) {
-        cal.addEvent(className, description,description, startDate, endDate);
-        startDateO.setDate(startDateO.getDate() + 7);
-        startDate = startDateO.toISOString();
-        endDateO.setDate(endDateO.getDate() + 7);
-        endDate = endDateO.toISOString();
-    }
+    //trying to get rrule to work
+
+    //repeat weekly for 15 counts
+    rrule_actual = "RRULE:FREQ=WEEKLY;COUNT=15";
+
+    cal.addEvent(className, description,description, startDate, endDate, rrule_actual);
+
+    // this is from the main branch
+    
+    // for (let j = 0; j < 15; j++) {
+    //     cal.addEvent(className, description,description, startDate, endDate);
+    //     startDateO.setDate(startDateO.getDate() + 7);
+    //     startDate = startDateO.toISOString();
+    //     endDateO.setDate(endDateO.getDate() + 7);
+    //     endDate = endDateO.toISOString();
+    // }
 
 
 }
