@@ -174,41 +174,127 @@ var ics = function(uidDomain, prodId) {
   };
 
 
-var allClasses = document.getElementsByClassName("tt-activity");
+
+function getDayInTerm(term, dayOfWeek, startTime, endTime) {
+    // Extract the year from the term (assuming term is in the format "YYYY Season")
+    const year = parseInt(term.match(/\d{4}/)[0], 10);
+
+    let date;
+
+    if (term.includes("Spring")) {
+        // Start with the last week of January
+        date = new Date(year, 0, 31); // January 31st of the extracted year
+        // Go back to the previous day of the week
+        const lastDayOfWeek = date.getDay();
+        const dayDifference = lastDayOfWeek >= dayOfWeek ? lastDayOfWeek - dayOfWeek : 7 + lastDayOfWeek - dayOfWeek;
+        date.setDate(date.getDate() - dayDifference);
+    } else if (term.includes("Fall")) {
+        // Start with the first week of September
+        date = new Date(year, 8, 1); // September 1st of the extracted year
+        // Go forward to the next day of the week
+        const firstDayOfWeek = date.getDay();
+        const dayDifference = dayOfWeek >= firstDayOfWeek ? dayOfWeek - firstDayOfWeek : 7 - (firstDayOfWeek - dayOfWeek);
+        date.setDate(date.getDate() + dayDifference);
+    } else {
+        throw new Error("Unsupported term: " + term);
+    }
+
+    // Parse start and end times
+    const [startHour, startMinute, startPeriod] = parseTime(startTime);
+    const [endHour, endMinute, endPeriod] = parseTime(endTime);
+
+    // Create date objects for start and end times
+    const startDate = new Date(date);
+    startDate.setHours(startHour + (startPeriod === 'pm' && startHour !== 12 ? 12 : 0), startMinute, 0, 0);
+
+    const endDate = new Date(date);
+    endDate.setHours(endHour + (endPeriod === 'pm' && endHour !== 12 ? 12 : 0), endMinute, 0, 0);
+
+    return [ startDate, endDate ];
+}
+
+function parseTime(time) {
+    const [hourMinute, period] = time.split(" ");
+    const [hour, minute] = hourMinute.split(":").map(Number);
+    return [hour, minute, period];
+}
+
+// // Example usage:
+// const dayOfWeek = 3; // 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc.
+// const term = "2024 Fall";
+// const startTime = "1:00 PM";
+// const endTime = "2:00 PM";
+
+// const { startDate, endDate } = getDayInTerm(term, dayOfWeek, startTime, endTime);
+
+// console.log("Start Date:", startDate);
+// console.log("End Date:", endDate);
+
+// Get all course sections
+
+// Get the select element by its ID
+var selectElement = document.getElementById("term-code");
+
+
+var currentTerm = selectElement.options[selectElement.selectedIndex].text;
+
+
+var allCourses = document.querySelectorAll('#courses-list > div');
+
 
 var cal = ics();
-for (let i = 0; i < allClasses.length; i++) {
 
-    //extracting info about events from website
-    var className = allClasses[i].children[0].children[0].innerHTML;
-    var description = allClasses[i].children[0].children[1].innerHTML;
-    description = description + " " + allClasses[i].children[0].children[2].innerHTML;
-    description= description.replace("&nbsp;", " ");
-    var date = allClasses[i].children[0].children[3].innerHTML.split(" ");
-    var time = allClasses[i].children[0].children[4].innerHTML.split("to");
-    var startDate = time[0] + date[0] + " " + date[1] + " " + date[date.length - 1];
-    var endDate = time[1] + " " + date[0] + " " + date[1] + " " + date[date.length - 1];   
-    var day = allClasses[i].parentElement.children[0].innerHTML.substring(0, 2).toUpperCase();
+for (let i = 0; i < allCourses.length; i++) {
+    var course = allCourses[i];
+    
+    // Extract course name
+    var className = course.querySelector('h3').innerText;
+    
+    // Extract weekly meetings
+    // var meetings = course.querySelectorAll('ul:first-of-type > li');
+    const meetings = course.querySelectorAll('ul')[0].children
+    
+    for (let meeting of meetings) {
+        var type = meeting.querySelector('strong').innerText;
+        var details = meeting.querySelector('span').innerText;
+        var description = `${type}: ${details}`;
 
-    var untilDate = new Date(date[3]+" "+date[4] +" "+ date[date.length - 1]);
+        // Extract day and time
+        var [days, start_time1, start_time2, temp, end_time1, end_time2] = details.split(' ', 6);
+        var startTime = `${start_time1} ${start_time2}`;
+        var endTime = `${end_time1} ${end_time2}`;
 
-    var startDateO = new Date(startDate);
-    var endDateO = new Date(endDate);
-    var dayActual = startDateO.getDay();
-    var daysOfWeek = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA']
-    var dayDiff = dayActual - daysOfWeek.indexOf(day);
-    if (dayDiff < 0) {
-        dayDiff = 7 + dayDiff;
-    }
-    //some week logic to get correct day
-    endDateO.setDate(endDateO.getDate()- dayDiff);
-    endDate = endDateO.toISOString();
-    startDateO.setDate(startDateO.getDate() - dayDiff);
-    startDate = startDateO.toISOString();
+ 
 
-    //adding event to calendar , also passing until date till witch event will be repeated
-    cal.addEvent(className, description,description, startDate, endDate, untilDate);
+        
+        
+        // Extract exam date (as end date)
+        // var examDate = course.querySelector('ul:last-of-type > li > span');
+        // var endDate = examDate ? new Date(examDate.innerText.split(',')[0] + ', ' + new Date().getFullYear()) : null;
+        
 
+            
+            // Parse days
+            var daysArray = days.split('');
+            daysArray.forEach(day => {
+                var dayIndex = 'UMTWRFS'.indexOf(day);
+                if (dayIndex !== -1) {
+                    var [eventStartDate, eventEndDate] = getDayInTerm(currentTerm, dayIndex, startTime, endTime);
+
+                    // console.log(eventStartDate);
+                    // console.log(eventEndDate);
+
+                    // repeat until 15 weeks from eventStartDate
+                    var repeat_until_date = new Date(eventEndDate);
+                    repeat_until_date.setDate(repeat_until_date.getDate() + 15*7);
+
+                    
+                    // // Add event to calendar
+                    cal.addEvent(className, description, description, eventStartDate.toISOString(), eventEndDate.toISOString(), repeat_until_date);
+                    // console.log([className, description, description, eventStartDate.toISOString(), eventEndDate.toISOString(), repeat_until_date]);
+                  }
+            });
+    };
 }
 
 cal.download();//downloading calendar

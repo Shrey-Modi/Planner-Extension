@@ -7,7 +7,7 @@ chrome.action.onClicked.addListener((tab) => {
   
   document.querySelector('#open').onclick = () => {
    
-      chrome.tabs.create({url: 'https://my.wisc.edu/portal/p/class-schedule'});
+      chrome.tabs.create({url: 'https://mumaaenroll.services.wisc.edu/courses-schedule/'});
     
   };
   

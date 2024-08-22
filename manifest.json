@@ -1,7 +1,7 @@
 {
     "name": "Badger Planner",
     "description": "Read UW portal scheduler website and generate an ics file to add to calendar of your choice",
-    "version": "1.2",
+    "version": "2.0",
     "manifest_version": 3,
     "background": {
         "service_worker": "background.js"
